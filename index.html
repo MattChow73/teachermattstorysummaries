@@ -656,7 +656,7 @@
         const card = document.querySelector('.flashcard.active');
         const front = card.querySelector('.flashcard-front');
         const summary = card.querySelector('.summary');
-        const explanation = card.querySelector('.grammar-lesson strong:first-child').nextSibling.textContent;
+        const explanation = card.querySelector('.grammar-lesson strong:first-child').nextSibling.textContent.trim();
         const titleText = front.textContent.replace(/<[^>]+>/g, '');
         const summaryText = summary.textContent.replace(/<[^>]+>/g, '');
         const combinedText = `${titleText}. ${summaryText}. ${explanation}`;
