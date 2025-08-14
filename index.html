@@ -652,51 +652,51 @@
     }
 
     function startStory() {
-      if ('speechSynthesis' in window) {
-        const card = document.querySelector('.flashcard.active');
-        const front = card.querySelector('.flashcard-front');
-        const summary = card.querySelector('.summary');
-        const explanation = card.querySelector('.grammar-lesson strong:first-child').nextSibling.textContent.trim();
-        const titleText = front.textContent.replace(/<[^>]+>/g, '');
-        const summaryText = summary.textContent.replace(/<[^>]+>/g, '');
-        const combinedText = `${titleText}. ${summaryText}. ${explanation}`;
-        const utterance = new SpeechSynthesisUtterance(combinedText);
-        utterance.lang = 'en-GB';
-        const voice = getBritishVoice();
-        if (voice && voice.lang === 'en-GB') {
-          utterance.voice = voice;
-        } else {
-          const message = document.createElement('div');
-          message.className = 'speech-message';
-          message.textContent = 'No British voice found, using default voice.';
-          document.querySelector('h1').after(message);
-        }
-        utterance.onerror = (event) => {
-          console.error('Speech synthesis error:', event.error);
-          const message = document.createElement('div');
-          message.className = 'speech-message';
-          message.textContent = 'Speech synthesis not supported or failed.';
-          document.querySelector('h1').after(message);
-        };
-        utterance.onend = () => {
-          document.querySelector('.start-button').style.display = 'block';
-          document.querySelector('.continue-button').style.display = 'none';
-          const message = document.querySelector('.speech-message');
-          if (message) message.remove();
-        };
-        window.speechSynthesis.speak(utterance);
-        document.querySelector('.start-button').style.display = 'none';
-        toggleCard(card);
+    if ('speechSynthesis' in window) {
+      const card = document.querySelector('.flashcard.active');
+      const front = card.querySelector('.flashcard-front');
+      const summary = card.querySelector('.summary');
+      const explanation = card.querySelector('.grammar-lesson strong:first-child').nextSibling.textContent.trim();
+      const titleText = front.textContent.replace(/<[^>]+>/g, '');
+      const summaryText = summary.textContent.replace(/<[^>]+>/g, '');
+      const combinedText = `${titleText}. ${summaryText}. ${explanation}`;
+      const utterance = new SpeechSynthesisUtterance(combinedText);
+      utterance.lang = 'en-GB';
+      const voice = getBritishVoice();
+      if (voice && voice.lang === 'en-GB') {
+        utterance.voice = voice;
       } else {
         const message = document.createElement('div');
         message.className = 'speech-message';
-        message.textContent = 'Speech synthesis not supported in this browser.';
+        message.textContent = 'No British voice found, using default voice.';
         document.querySelector('h1').after(message);
-        document.querySelector('.start-button').style.display = 'none';
-        document.querySelector('.continue-button').style.display = 'block';
-        toggleCard(document.querySelector('.flashcard.active'));
       }
+      utterance.onerror = (event) => {
+        console.error('Speech synthesis error:', event.error);
+        const message = document.createElement('div');
+        message.className = 'speech-message';
+        message.textContent = 'Speech synthesis not supported or failed.';
+        document.querySelector('h1').after(message);
+      };
+      utterance.onend = () => {
+        document.querySelector('.start-button').style.display = 'block';
+        document.querySelector('.continue-button').style.display = 'none';
+        const message = document.querySelector('.speech-message');
+        if (message) message.remove();
+      };
+      window.speechSynthesis.speak(utterance);
+      document.querySelector('.start-button').style.display = 'none';
+      toggleCard(card);
+    } else {
+      const message = document.createElement('div');
+      message.className = 'speech-message';
+      message.textContent = 'Speech synthesis not supported in this browser.';
+      document.querySelector('h1').after(message);
+      document.querySelector('.start-button').style.display = 'none';
+      document.querySelector('.continue-button').style.display = 'block';
+      toggleCard(document.querySelector('.flashcard.active'));
     }
+  }
 
     function toggleCard(card) {
       try {
