@@ -604,59 +604,64 @@
     <button class="nav-button" id="next-button" aria-label="Go to next flashcard" onclick="navigateCard('next')">
       <img src="https://cdn-icons-png.flaticon.com/512/271/271228.png" alt="Go to next flashcard" class="nav-icon">
     </button>
-  </div>
-  <script>
-    let currentCardIndex = 0;
-    const cards = document.querySelectorAll('.flashcard');
-    const preferredVoices = ['Google UK English Female', 'Google UK English Male', 'Daniel', 'Kate'];
+  </div><script>
+  let currentCardIndex = 0;
+  const cards = document.querySelectorAll('.flashcard');
+  const preferredVoices = ['Google UK English Female', 'Google UK English Male', 'Daniel', 'Kate'];
 
-    function getBritishVoice() {
-      const voices = window.speechSynthesis.getVoices();
-      return voices.find(voice => preferredVoices.includes(voice.name) && voice.lang === 'en-GB') ||
-             voices.find(voice => voice.lang === 'en-GB') ||
-             voices.find(voice => voice.lang === 'en-US');
-    }
+  function getBritishVoice() {
+    const voices = window.speechSynthesis.getVoices();
+    return voices.find(voice => preferredVoices.includes(voice.name) && voice.lang === 'en-GB') ||
+           voices.find(voice => voice.lang === 'en-GB') ||
+           voices.find(voice => voice.lang === 'en-US');
+  }
 
-    function updateCardDisplay() {
-      cards.forEach((card, index) => {
-        card.classList.toggle('active', index === currentCardIndex);
-        if (index === currentCardIndex) {
-          card.querySelector('.flashcard-front').classList.add('active');
-          card.querySelector('.flashcard-back').classList.remove('active');
-          card.setAttribute('aria-expanded', 'false');
-        }
-      });
-      document.querySelector('.start-button').style.display = 'block';
-      document.querySelector('.continue-button').style.display = 'none';
-      document.querySelector('#prev-button').disabled = currentCardIndex === 0;
-      document.querySelector('#next-button').disabled = currentCardIndex === cards.length - 1;
-      const prevIcon = document.querySelector('#prev-button .nav-icon');
-      const nextIcon = document.querySelector('#next-button .nav-icon');
-      prevIcon.classList.toggle('disabled', currentCardIndex === 0);
-      nextIcon.classList.toggle('disabled', currentCardIndex === cards.length - 1);
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
+  function updateCardDisplay() {
+    cards.forEach((card, index) => {
+      card.classList.toggle('active', index === currentCardIndex);
+      if (index === currentCardIndex) {
+        card.querySelector('.flashcard-front').classList.add('active');
+        card.querySelector('.flashcard-back').classList.remove('active');
+        card.setAttribute('aria-expanded', 'false');
       }
-      adjustFontSize();
-      const message = document.querySelector('.speech-message');
-      if (message) message.remove();
+    });
+    document.querySelector('.start-button').style.display = 'block';
+    document.querySelector('.continue-button').style.display = 'none';
+    document.querySelector('#prev-button').disabled = currentCardIndex === 0;
+    document.querySelector('#next-button').disabled = currentCardIndex === cards.length - 1;
+    const prevIcon = document.querySelector('#prev-button .nav-icon');
+    const nextIcon = document.querySelector('#next-button .nav-icon');
+    prevIcon.classList.toggle('disabled', currentCardIndex === 0);
+    nextIcon.classList.toggle('disabled', currentCardIndex === cards.length - 1);
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
     }
+    adjustFontSize();
+    const message = document.querySelector('.speech-message');
+    if (message) message.remove();
+  }
 
-    function navigateCard(direction) {
-      if (direction === 'next' && currentCardIndex < cards.length - 1) {
-        currentCardIndex++;
-      } else if (direction === 'prev' && currentCardIndex > 0) {
-        currentCardIndex--;
-      }
-      updateCardDisplay();
+  function navigateCard(direction) {
+    if (direction === 'next' && currentCardIndex < cards.length - 1) {
+      currentCardIndex++;
+    } else if (direction === 'prev' && currentCardIndex > 0) {
+      currentCardIndex--;
     }
+    updateCardDisplay();
+  }
 
-    function startStory() {
+  function startStory() {
     if ('speechSynthesis' in window) {
       const card = document.querySelector('.flashcard.active');
       const front = card.querySelector('.flashcard-front');
       const summary = card.querySelector('.summary');
-      const explanation = card.querySelector('.grammar-lesson strong:first-child').nextSibling.textContent.trim();
+      const explanationElement = card.querySelector('.grammar-lesson').querySelector('strong:first-child').nextSibling;
+      let explanation = '';
+      if (explanationElement && explanationElement.nodeType === Node.TEXT_NODE) {
+        explanation = explanationElement.textContent.trim();
+      } else if (explanationElement) {
+        explanation = explanationElement.textContent.trim();
+      }
       const titleText = front.textContent.replace(/<[^>]+>/g, '');
       const summaryText = summary.textContent.replace(/<[^>]+>/g, '');
       const combinedText = `${titleText}. ${summaryText}. ${explanation}`;
@@ -698,72 +703,72 @@
     }
   }
 
-    function toggleCard(card) {
-      try {
-        const front = card.querySelector('.flashcard-front');
-        const back = card.querySelector('.flashcard-back');
-        front.classList.toggle('active');
-        back.classList.toggle('active');
-        card.setAttribute('aria-expanded', back.classList.contains('active'));
-        adjustFontSize();
-        const message = document.querySelector('.speech-message');
-        if (message) message.remove();
-      } catch (error) {
-        console.error('Error toggling card:', error);
-        card.querySelector('.flashcard-front').classList.remove('active');
-        card.querySelector('.flashcard-back').classList.add('active');
-        card.setAttribute('aria-expanded', 'true');
-      }
-    }
-
-    function handleKeydown(event) {
-      if (event.key === 'Enter' || event.key === ' ') {
-        toggleCard(event.currentTarget);
-        event.preventDefault();
-      }
-    }
-
-    function adjustFontSize() {
-      const card = document.querySelector('.flashcard.active');
+  function toggleCard(card) {
+    try {
+      const front = card.querySelector('.flashcard-front');
       const back = card.querySelector('.flashcard-back');
-      const padding = parseInt(getComputedStyle(card).paddingTop) * 2;
-      const availableHeight = card.clientHeight - padding;
-      let fontSize = parseFloat(getComputedStyle(back).fontSize);
-      let minFontSize = 12;
-      let maxFontSize = 18;
-      let step = 0.25;
-      while (back.scrollHeight > availableHeight && fontSize > minFontSize) {
-        fontSize -= step;
-        updateFontSizes(back, fontSize);
-      }
-      while (back.scrollHeight < availableHeight * 0.95 && fontSize < maxFontSize) {
-        fontSize += step;
-        updateFontSizes(back, fontSize);
-      }
+      front.classList.toggle('active');
+      back.classList.toggle('active');
+      card.setAttribute('aria-expanded', back.classList.contains('active'));
+      adjustFontSize();
+      const message = document.querySelector('.speech-message');
+      if (message) message.remove();
+    } catch (error) {
+      console.error('Error toggling card:', error);
+      card.querySelector('.flashcard-front').classList.remove('active');
+      card.querySelector('.flashcard-back').classList.add('active');
+      card.setAttribute('aria-expanded', 'true');
     }
+  }
 
-    function updateFontSizes(back, fontSize) {
-      back.style.fontSize = `${fontSize}px`;
-      back.querySelector('.story-title').style.fontSize = `${fontSize * 0.9}px`;
-      back.querySelector('.summary').style.fontSize = `${fontSize * 1.15}px`;
-      back.querySelector('.grammar-lesson').style.fontSize = `${fontSize * 0.85}px`;
+  function handleKeydown(event) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      toggleCard(event.currentTarget);
+      event.preventDefault();
     }
+  }
 
-    let resizeTimeout;
-    window.addEventListener('load', () => {
-      window.speechSynthesis.onvoiceschanged = () => {
-        updateCardDisplay();
-      };
+  function adjustFontSize() {
+    const card = document.querySelector('.flashcard.active');
+    const back = card.querySelector('.flashcard-back');
+    const padding = parseInt(getComputedStyle(card).paddingTop) * 2;
+    const availableHeight = card.clientHeight - padding;
+    let fontSize = parseFloat(getComputedStyle(back).fontSize);
+    let minFontSize = 12;
+    let maxFontSize = 18;
+    let step = 0.25;
+    while (back.scrollHeight > availableHeight && fontSize > minFontSize) {
+      fontSize -= step;
+      updateFontSizes(back, fontSize);
+    }
+    while (back.scrollHeight < availableHeight * 0.95 && fontSize < maxFontSize) {
+      fontSize += step;
+      updateFontSizes(back, fontSize);
+    }
+  }
+
+  function updateFontSizes(back, fontSize) {
+    back.style.fontSize = `${fontSize}px`;
+    back.querySelector('.story-title').style.fontSize = `${fontSize * 0.9}px`;
+    back.querySelector('.summary').style.fontSize = `${fontSize * 1.15}px`;
+    back.querySelector('.grammar-lesson').style.fontSize = `${fontSize * 0.85}px`;
+  }
+
+  let resizeTimeout;
+  window.addEventListener('load', () => {
+    window.speechSynthesis.onvoiceschanged = () => {
       updateCardDisplay();
-      if (!('speechSynthesis' in window)) {
-        document.querySelector('.start-button').style.display = 'none';
-        document.querySelector('.continue-button').style.display = 'block';
-      }
-    });
-    window.addEventListener('resize', () => {
-      clearTimeout(resizeTimeout);
-      resizeTimeout = setTimeout(adjustFontSize, 100);
-    });
-  </script>
+    };
+    updateCardDisplay();
+    if (!('speechSynthesis' in window)) {
+      document.querySelector('.start-button').style.display = 'none';
+      document.querySelector('.continue-button').style.display = 'block';
+    }
+  });
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(adjustFontSize, 100);
+  });
+</script>
 </body>
 </html>
