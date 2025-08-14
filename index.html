@@ -1,12 +1,769 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Winnie the Pooh Image</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teacher Matt's Story Summaries</title>
+  <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/1828/1828884.png" />
+  <link rel="alternate icon" type="image/x-icon" href="https://cdn-icons-png.flaticon.com/128/1828/1828884.ico" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 100%;
+      margin: 0 auto;
+      padding: 1rem;
+      background-color: #f4f4f4;
+      box-sizing: border-box;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+      font-size: clamp(1.2rem, 5vw, 1.5rem);
+      font-family: "Comic Sans MS", Arial, sans-serif;
+      margin: 0.5rem 0;
+    }
+    .flashcard {
+      background: white;
+      border: 2px solid #ccc;
+      border-radius: 12px;
+      width: min(95vw, 340px);
+      height: auto;
+      min-height: 300px;
+      margin: 1rem auto;
+      padding: 1rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      cursor: pointer;
+      text-align: center;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      box-sizing: border-box;
+      touch-action: manipulation;
+    }
+    .flashcard.active {
+      display: flex;
+    }
+    .flashcard-front, .flashcard-back {
+      display: none;
+    }
+    .flashcard-front.active, .flashcard-back.active {
+      display: block;
+    }
+    .flashcard-front {
+      font-weight: bold;
+      color: #2c3e50;
+      font-size: clamp(1rem, 4.5vw, 1.25rem);
+      padding: 0.5rem;
+      overflow-wrap: break-word;
+    }
+    .flashcard-front img {
+      width: 100%;
+      height: auto;
+      max-height: 200px;
+      object-fit: contain;
+      margin-bottom: 1rem;
+    }
+    .flashcard-back .story-title {
+      font-size: clamp(0.9rem, 4vw, 1.1rem);
+      color: #2c3e50;
+      margin-bottom: 0.5rem;
+      padding: 0.5rem;
+      overflow-wrap: break-word;
+    }
+    .flashcard-back .summary {
+      font-size: clamp(1rem, 4.5vw, 1.25rem);
+      font-weight: bold;
+      color: #2c3e50;
+      margin-bottom: 0.5rem;
+      padding: 0.5rem;
+      overflow-wrap: break-word;
+    }
+    .flashcard-back hr {
+      border: 1px solid #ccc;
+      margin: 0.5rem 0;
+    }
+    .flashcard-back .grammar-lesson {
+      font-size: clamp(0.8rem, 3.5vw, 1rem);
+      color: #34495e;
+      padding: 0.5rem;
+      overflow-y: visible;
+    }
+    .grammar-noun { color: #00008B; font-weight: bold; }
+    .grammar-verb { color: #FF0000; font-weight: bold; }
+    .grammar-adjective { color: #006400; }
+    .grammar-adverb { color: #FF7F50; }
+    .grammar-article { color: #FFD700; }
+    .grammar-preposition { color: #90EE90; }
+    .grammar-conjunction { color: #4A4A4A; }
+    .grammar-pronoun { color: #4682B4; }
+    .grammar-key {
+      font-size: clamp(0.8rem, 3.5vw, 1rem);
+      color: #7f8c8d;
+      text-align: center;
+      margin: 1rem auto;
+      width: min(95vw, 340px);
+      border-top: 1px solid #ccc;
+      padding-top: 0.5rem;
+    }
+    .navigation {
+      text-align: center;
+      margin-top: 1rem;
+    }
+    .nav-icon {
+      width: clamp(2rem, 8vw, 2.5rem);
+      height: clamp(2rem, 8vw, 2.5rem);
+      margin: 0 0.75rem;
+      vertical-align: middle;
+      touch-action: manipulation;
+    }
+    .nav-icon.disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+    .speech-message {
+      text-align: center;
+      color: #e74c3c;
+      font-size: clamp(0.8rem, 3.5vw, 1rem);
+      margin: 0.5rem auto;
+      width: min(95vw, 340px);
+    }
+    .start-button, .continue-button {
+      display: block;
+      margin: 0.75rem auto;
+      padding: 0.5rem 1.5rem;
+      font-size: clamp(0.9rem, 4vw, 1.1rem);
+      background-color: #2c3e50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    .continue-button {
+      display: none;
+    }
+    .start-button:hover, .continue-button:hover {
+      background-color: #34495e;
+    }
+    @media (max-width: 768px) {
+      body {
+        padding: 0.5rem;
+      }
+      .flashcard {
+        width: min(95vw, 320px);
+        min-height: 280px;
+        padding: 0.75rem;
+      }
+      .flashcard-front {
+        font-size: clamp(0.9rem, 4.5vw, 1.1rem);
+      }
+      .flashcard-back .story-title {
+        font-size: clamp(0.8rem, 4vw, 1rem);
+      }
+      .flashcard-back .summary {
+        font-size: clamp(0.9rem, 4.5vw, 1.1rem);
+      }
+      .flashcard-back .grammar-lesson {
+        font-size: clamp(0.7rem, 3.5vw, 0.9rem);
+      }
+      .grammar-key {
+        font-size: clamp(0.7rem, 3.5vw, 0.9rem);
+        width: min(95vw, 320px);
+      }
+      .nav-icon {
+        width: clamp(1.8rem, 7vw, 2.2rem);
+        height: clamp(1.8rem, 7vw, 2.2rem);
+      }
+      .start-button, .continue-button {
+        padding: 0.5rem 1.25rem;
+        font-size: clamp(0.8rem, 4vw, 1rem);
+      }
+    }
+    .flashcard:focus {
+      outline: 2px solid #2c3e50;
+      outline-offset: 2px;
+    }
+  </style>
 </head>
 <body>
-    <h1>Winnie the Pooh</h1>
-    <img src="winniethepooh1.jpg" alt="Winnie the Pooh" style="max-width: 100%; height: auto;" />
+  <h1>Teacher Matt's Story Summaries</h1>
+  <button class="start-button" onclick="startStory()">Start Story</button>
+  <button class="continue-button" onclick="toggleCard(document.querySelector('.flashcard.active'))">Continue</button>
+  <div class="flashcard active" role="button" aria-expanded="false" aria-label="Interactive story summary flashcard 1" tabindex="0" onclick="toggleCard(this)" onkeydown="handleKeydown(event)" ontouchstart="toggleCard(this)">
+    <div class="flashcard-front active">
+      <img src="https://raw.githubusercontent.com/book-covers/repo/main/The-Very-Hungry-Caterpillar.jpg" alt="The Very Hungry Caterpillar cover">
+      <span class="grammar-article">The</span> Very Hungry <span class="grammar-noun">Caterpillar</span>
+    </div>
+    <div class="flashcard-back">
+      <div class="story-title"><span class="grammar-article">The</span> Very Hungry <span class="grammar-noun">Caterpillar</span></div>
+      <div class="summary"><span class="grammar-article">A</span> <span class="grammar-noun">caterpillar</span> <span class="grammar-verb">eats</span> <span class="grammar-adjective">juicy</span> <span class="grammar-noun">fruits</span> <span class="grammar-conjunction">and</span> <span class="grammar-verb">grows</span> into <span class="grammar-article">a</span> <span class="grammar-adjective">beautiful</span> <span class="grammar-noun">butterfly</span>.</div>
+      <hr>
+      <div class="grammar-lesson">
+        <strong>Story Explanation:</strong> <span class="grammar-article">The</span> <span class="grammar-noun">story</span> <span class="grammar-verb">shows</span> <span class="grammar-article">a</span> <span class="grammar-noun">caterpillar</span>’s <span class="grammar-adjective">amazing</span> <span class="grammar-noun">transformation</span>.<br>
+        <hr>
+        <strong>Grammar Lesson:</strong><br>
+        - "<span class="grammar-article">a</span>": <span class="grammar-article">article</span> introduces <span class="grammar-noun">noun</span>.<br>
+        - "<span class="grammar-noun">caterpillar</span>": <span class="grammar-noun">noun</span> names <span class="grammar-adjective">living</span> thing.<br>
+        - "<span class="grammar-verb">eats/grows</span>": <span class="grammar-verb">verbs</span> show action.<br>
+        - "<span class="grammar-adjective">juicy/beautiful</span>": <span class="grammar-adjective">adjectives</span> describe <span class="grammar-noun">nouns</span>.<br>
+        - "<span class="grammar-conjunction">and</span>": <span class="grammar-conjunction">conjunction</span> connects ideas.
+      </div>
+    </div>
+  </div>
+  <div class="flashcard" role="button" aria-expanded="false" aria-label="Interactive story summary flashcard 2" tabindex="0" onclick="toggleCard(this)" onkeydown="handleKeydown(event)" ontouchstart="toggleCard(this)">
+    <div class="flashcard-front active">
+      <img src="https://raw.githubusercontent.com/book-covers/repo/main/Where-the-Wild-Things-Are.jpg" alt="Where the Wild Things Are cover">
+      Where <span class="grammar-article">the</span> Wild <span class="grammar-noun">Things</span> Are
+    </div>
+    <div class="flashcard-back">
+      <div class="story-title">Where <span class="grammar-article">the</span> Wild <span class="grammar-noun">Things</span> Are</div>
+      <div class="summary"><span class="grammar-noun">Max</span> <span class="grammar-verb">sails</span> <span class="grammar-preposition">to</span> <span class="grammar-article">a</span> <span class="grammar-adjective">magical</span> <span class="grammar-noun">land</span> <span class="grammar-conjunction">and</span> <span class="grammar-verb">rules</span> <span class="grammar-adjective">wild</span> <span class="grammar-noun">creatures</span>.</div>
+      <hr>
+      <div class="grammar-lesson">
+        <strong>Story Explanation:</strong> <span class="grammar-noun">Max</span>’s <span class="grammar-adjective">imaginative</span> <span class="grammar-noun">adventure</span> <span class="grammar-verb">explores</span> <span class="grammar-adjective">wild</span> <span class="grammar-noun">freedom</span>.<br>
+        <hr>
+        <strong>Grammar Lesson:</strong><br>
+        - "<span class="grammar-noun">Max</span>": <span class="grammar-noun">noun</span> names <span class="grammar-adjective">specific</span> <span class="grammar-noun">person</span>.<br>
+        - "<span class="grammar-verb">sails/rules</span>": <span class="grammar-verb">verbs</span> show action.<br>
+        - "<span class="grammar-adjective">magical/wild</span>": <span class="grammar-adjective">adjectives</span> describe <span class="grammar-noun">nouns</span>.<br>
+        - "<span class="grammar-preposition">to</span>": <span class="grammar-preposition">preposition</span> shows <span class="grammar-noun">place</span>.<br>
+        - "<span class="grammar-conjunction">and</span>": <span class="grammar-conjunction">conjunction</span> joins ideas.
+      </div>
+    </div>
+  </div>
+  <div class="flashcard" role="button" aria-expanded="false" aria-label="Interactive story summary flashcard 3" tabindex="0" onclick="toggleCard(this)" onkeydown="handleKeydown(event)" ontouchstart="toggleCard(this)">
+    <div class="flashcard-front active">
+      <img src="https://raw.githubusercontent.com/book-covers/repo/main/The-Gruffalo.jpg" alt="The Gruffalo cover">
+      <span class="grammar-article">The</span> <span class="grammar-noun">Gruffalo</span>
+    </div>
+    <div class="flashcard-back">
+      <div class="story-title"><span class="grammar-article">The</span> <span class="grammar-noun">Gruffalo</span></div>
+      <div class="summary"><span class="grammar-article">A</span> <span class="grammar-noun">mouse</span> <span class="grammar-verb">tricks</span> <span class="grammar-adjective">clever</span> <span class="grammar-noun">animals</span> with <span class="grammar-article">a</span> <span class="grammar-adjective">scary</span> <span class="grammar-noun">monster</span> <span class="grammar-preposition">in</span> <span class="grammar-article">a</span> <span class="grammar-adjective">deep</span> <span class="grammar-noun">forest</span>.</div>
+      <hr>
+      <div class="grammar-lesson">
+        <strong>Story Explanation:</strong> <span class="grammar-noun">Mouse</span> <span class="grammar-verb">uses</span> <span class="grammar-adjective">smart</span> <span class="grammar-noun">tricks</span> <span class="grammar-preposition">to</span> <span class="grammar-verb">survive</span>.<br>
+        <hr>
+        <strong>Grammar Lesson:</strong><br>
+        - "<span class="grammar-article">a</span>": <span class="grammar-article">article</span> introduces <span class="grammar-noun">noun</span>.<br>
+        - "<span class="grammar-noun">mouse/animals</span>": <span class="grammar-noun">nouns</span> name things.<br>
+        - "<span class="grammar-verb">tricks</span>": <span class="grammar-verb">verb</span> shows action.<br>
+        - "<span class="grammar-adjective">clever/scary/deep</span>": <span class="grammar-adjective">adjectives</span> describe <span class="grammar-noun">nouns</span>.<br>
+        - "<span class="grammar-preposition">in</span>": <span class="grammar-preposition">preposition</span> shows <span class="grammar-noun">place</span>.
+      </div>
+    </div>
+  </div>
+  <div class="flashcard" role="button" aria-expanded="false" aria-label="Interactive story summary flashcard 4" tabindex="0" onclick="toggleCard(this)" onkeydown="handleKeydown(event)" ontouchstart="toggleCard(this)">
+    <div class="flashcard-front active">
+      <img src="https://raw.githubusercontent.com/book-covers/repo/main/Winnie-the-Pooh.jpg" alt="Winnie-the-Pooh cover">
+      <span class="grammar-noun">Winnie-the-Pooh</span>
+    </div>
+    <div class="flashcard-back">
+      <div class="story-title"><span class="grammar-noun">Winnie-the-Pooh</span></div>
+      <div class="summary"><span class="grammar-noun">Pooh</span> <span class="grammar-verb">explores</span> <span class="grammar-article">the</span> <span class="grammar-adjective">hundred-acre</span> <span class="grammar-noun">wood</span> with <span class="grammar-noun">friends</span> <span class="grammar-conjunction">and</span> <span class="grammar-verb">loves</span> <span class="grammar-adjective">sweet</span> <span class="grammar-noun">honey</span>.</div>
+      <hr>
+      <div class="grammar-lesson">
+        <strong>Story Explanation:</strong> <span class="grammar-noun">Pooh</span>’s <span class="grammar-adjective">simple</span> <span class="grammar-noun">adventures</span> <span class="grammar-verb">show</span> <span class="grammar-adjective">warm</span> <span class="grammar-noun">friendship</span>.<br>
+        <hr>
+        <strong>Grammar Lesson:</strong><br>
+        - "<span class="grammar-noun">Pooh/friends</span>": <span class="grammar-noun">nouns</span> name <span class="grammar-adjective">specific</span> things.<br>
+        - "<span class="grammar-verb">explores/loves</span>": <span class="grammar-verb">verbs</span> show action.<br>
+        - "<span class="grammar-adjective">hundred-acre/sweet</span>": <span class="grammar-adjective">adjectives</span> describe <span class="grammar-noun">nouns</span>.<br>
+        - "<span class="grammar-conjunction">and</span>": <span class="grammar-conjunction">conjunction</span> joins ideas.
+      </div>
+    </div>
+  </div>
+  <div class="flashcard" role="button" aria-expanded="false" aria-label="Interactive story summary flashcard 5" tabindex="0" onclick="toggleCard(this)" onkeydown="handleKeydown(event)" ontouchstart="toggleCard(this)">
+    <div class="flashcard-front active">
+      <img src="https://raw.githubusercontent.com/book-covers/repo/main/The-Cat-in-the-Hat.jpg" alt="The Cat in the Hat cover">
+      <span class="grammar-article">The</span> <span class="grammar-noun">Cat</span> <span class="grammar-preposition">in</span> <span class="grammar-article">the</span> <span class="grammar-noun">Hat</span>
+    </div>
+    <div class="flashcard-back">
+      <div class="story-title"><span class="grammar-article">The</span> <span class="grammar-noun">Cat</span> <span class="grammar-preposition">in</span> <span class="grammar-article">the</span> <span class="grammar-noun">Hat</span></div>
+      <div class="summary"><span class="grammar-article">A</span> <span class="grammar-noun">cat</span> <span class="grammar-verb">brings</span> <span class="grammar-adjective">chaotic</span> <span class="grammar-noun">fun</span> <span class="grammar-preposition">to</span> <span class="grammar-noun">kids</span> <span class="grammar-conjunction">and</span> <span class="grammar-verb">creates</span> <span class="grammar-article">a</span> <span class="grammar-adjective">messy</span> <span class="grammar-noun">adventure</span>.</div>
+      <hr>
+      <div class="grammar-lesson">
+        <strong>Story Explanation:</strong> <span class="grammar-noun">Cat</span>’s <span class="grammar-adjective">playful</span> <span class="grammar-noun">chaos</span> <span class="grammar-verb">teaches</span> <span class="grammar-adjective">fun</span> <span class="grammar-noun">lessons</span>.<br>
+        <hr>
+        <strong>Grammar Lesson:</strong><br>
+        - "<span class="grammar-article">a</span>": <span class="grammar-article">article</span> introduces <span class="grammar-noun">noun</span>.<br>
+        - "<span class="grammar-noun">cat/kids</span>": <span class="grammar-noun">nouns</span> name things.<br>
+        - "<span class="grammar-verb">brings/creates</span>": <span class="grammar-verb">verbs</span> show action.<br>
+        - "<span class="grammar-adjective">chaotic/messy</span>": <span class="grammar-adjective">adjectives</span> describe <span class="grammar-noun">nouns</span>.<br>
+        - "<span class="grammar-preposition">to</span>": <span class="grammar-preposition">preposition</span> shows <span class="grammar-noun">direction</span>.
+      </div>
+    </div>
+  </div>
+  <div class="flashcard" role="button" aria-expanded="false" aria-label="Interactive story summary flashcard 6" tabindex="0" onclick="toggleCard(this)" onkeydown="handleKeydown(event)" ontouchstart="toggleCard(this)">
+    <div class="flashcard-front active">
+      <img src="https://raw.githubusercontent.com/book-covers/repo/main/Charlotte%E2%80%99s-Web.jpg" alt="Charlotte’s Web cover">
+      <span class="grammar-noun">Charlotte’s Web</span>
+    </div>
+    <div class="flashcard-back">
+      <div class="story-title"><span class="grammar-noun">Charlotte’s Web</span></div>
+      <div class="summary"><span class="grammar-noun">Charlotte</span> <span class="grammar-verb">weaves</span> <span class="grammar-article">a</span> <span class="grammar-adjective">heartfelt</span> <span class="grammar-noun">web</span> <span class="grammar-preposition">to</span> <span class="grammar-verb">save</span> <span class="grammar-noun">Wilbur</span>, <span class="grammar-article">a</span> <span class="grammar-adjective">kind</span> <span class="grammar-noun">pig</span>.</div>
+      <hr>
+      <div class="grammar-lesson">
+        <strong>Story Explanation:</strong> <span class="grammar-noun">Friendship</span> <span class="grammar-verb">saves</span> <span class="grammar-noun">Wilbur</span> <span class="grammar-preposition">through</span> <span class="grammar-adjective">clever</span> <span class="grammar-noun">words</span>.<br>
+        <hr>
+        <strong>Grammar Lesson:</strong><br>
+        - "<span class="grammar-noun">Charlotte/Wilbur</span>": <span class="grammar-noun">nouns</span> name <span class="grammar-adjective">specific</span> things.<br>
+        - "<span class="grammar-verb">weaves/save</span>": <span class="grammar-verb">verbs</span> show action.<br>
+        - "<span class="grammar-adjective">heartfelt/kind</span>": <span class="grammar-adjective">adjectives</span> describe <span class="grammar-noun">nouns</span>.<br>
+        - "<span class="grammar-preposition">to</span>": <span class="grammar-preposition">preposition</span> shows <span class="grammar-noun">purpose</span>.
+      </div>
+    </div>
+  </div>
+  <div class="flashcard" role="button" aria-expanded="false" aria-label="Interactive story summary flashcard 7" tabindex="0" onclick="toggleCard(this)" onkeydown="handleKeydown(event)" ontouchstart="toggleCard(this)">
+    <div class="flashcard-front active">
+      <img src="https://raw.githubusercontent.com/book-covers/repo/main/The-Tale-of-Peter-Rabbit.jpg" alt="The Tale of Peter Rabbit cover">
+      <span class="grammar-article">The</span> <span class="grammar-noun">Tale</span> <span class="grammar-preposition">of</span> <span class="grammar-noun">Peter Rabbit</span>
+    </div>
+    <div class="flashcard-back">
+      <div class="story-title"><span class="grammar-article">The</span> <span class="grammar-noun">Tale</span> <span class="grammar-preposition">of</span> <span class="grammar-noun">Peter Rabbit</span></div>
+      <div class="summary"><span class="grammar-noun">Peter</span> <span class="grammar-verb">sneaks</span> into <span class="grammar-article">a</span> <span class="grammar-adjective">forbidden</span> <span class="grammar-noun">garden</span> <span class="grammar-conjunction">and</span> <span class="grammar-verb">escapes</span> <span class="grammar-adjective">tricky</span> <span class="grammar-noun">traps</span>.</div>
+      <hr>
+      <div class="grammar-lesson">
+        <strong>Story Explanation:</strong> <span class="grammar-noun">Peter</span> <span class="grammar-verb">learns</span> <span class="grammar-adjective">important</span> <span class="grammar-noun">lessons</span> <span class="grammar-preposition">about</span> <span class="grammar-noun">obedience</span>.<br>
+        <hr>
+        <strong>Grammar Lesson:</strong><br>
+        - "<span class="grammar-noun">Peter/garden</span>": <span class="grammar-noun">nouns</span> name things.<br>
+        - "<span class="grammar-verb">sneaks/escapes</span>": <span class="grammar-verb">verbs</span> show action.<br>
+        - "<span class="grammar-adjective">forbidden/tricky</span>": <span class="grammar-adjective">adjectives</span> describe <span class="grammar-noun">nouns</span>.<br>
+        - "<span class="grammar-conjunction">and</span>": <span class="grammar-conjunction">conjunction</span> joins ideas.
+      </div>
+    </div>
+  </div>
+  <div class="flashcard" role="button" aria-expanded="false" aria-label="Interactive story summary flashcard 8" tabindex="0" onclick="toggleCard(this)" onkeydown="handleKeydown(event)" ontouchstart="toggleCard(this)">
+    <div class="flashcard-front active">
+      <img src="https://raw.githubusercontent.com/book-covers/repo/main/Green-Eggs-and-Ham.jpg" alt="Green Eggs and Ham cover">
+      Green <span class="grammar-noun">Eggs</span> <span class="grammar-conjunction">and</span> <span class="grammar-noun">Ham</span>
+    </div>
+    <div class="flashcard-back">
+      <div class="story-title">Green <span class="grammar-noun">Eggs</span> <span class="grammar-conjunction">and</span> <span class="grammar-noun">Ham</span></div>
+      <div class="summary"><span class="grammar-noun">Sam</span> <span class="grammar-verb">convinces</span> <span class="grammar-article">a</span> <span class="grammar-adjective">stubborn</span> <span class="grammar-noun">eater</span> <span class="grammar-preposition">to</span> <span class="grammar-verb">try</span> <span class="grammar-adjective">unusual</span> <span class="grammar-noun">food</span> with <span class="grammar-adjective">funny</span> <span class="grammar-noun">rhymes</span>.</div>
+      <hr>
+      <div class="grammar-lesson">
+        <strong>Story Explanation:</strong> <span class="grammar-adjective">Silly</span> <span class="grammar-noun">rhymes</span> <span class="grammar-verb">encourage</span> <span class="grammar-adjective">new</span> <span class="grammar-noun">experiences</span>.<br>
+        <hr>
+        <strong>Grammar Lesson:</strong><br>
+        - "<span class="grammar-noun">Sam/eater</span>": <span class="grammar-noun">nouns</span> name things.<br>
+        - "<span class="grammar-verb">convinces/try</span>": <span class="grammar-verb">verbs</span> show action.<br>
+        - "<span class="grammar-adjective">stubborn/unusual/funny</span>": <span class="grammar-adjective">adjectives</span> describe <span class="grammar-noun">nouns</span>.<br>
+        - "<span class="grammar-preposition">to</span>": <span class="grammar-preposition">preposition</span> shows <span class="grammar-noun">purpose</span>.
+      </div>
+    </div>
+  </div>
+  <div class="flashcard" role="button" aria-expanded="false" aria-label="Interactive story summary flashcard 9" tabindex="0" onclick="toggleCard(this)" onkeydown="handleKeydown(event)" ontouchstart="toggleCard(this)">
+    <div class="flashcard-front active">
+      <img src="https://raw.githubusercontent.com/book-covers/repo/main/The-Lion-the-Witch-and-the-Wardrobe.jpg" alt="The Lion, the Witch and the Wardrobe cover">
+      <span class="grammar-article">The</span> <span class="grammar-noun">Lion</span>, <span class="grammar-article">the</span> <span class="grammar-noun">Witch</span> <span class="grammar-conjunction">and</span> <span class="grammar-article">the</span> <span class="grammar-noun">Wardrobe</span>
+    </div>
+    <div class="flashcard-back">
+      <div class="story-title"><span class="grammar-article">The</span> <span class="grammar-noun">Lion</span>, <span class="grammar-article">the</span> <span class="grammar-noun">Witch</span> <span class="grammar-conjunction">and</span> <span class="grammar-article">the</span> <span class="grammar-noun">Wardrobe</span></div>
+      <div class="summary"><span class="grammar-noun">Siblings</span> <span class="grammar-verb">discover</span> <span class="grammar-article">a</span> <span class="grammar-adjective">magical</span> <span class="grammar-noun">land</span> <span class="grammar-conjunction">and</span> <span class="grammar-verb">fight</span> <span class="grammar-article">a</span> <span class="grammar-adjective">wicked</span> <span class="grammar-noun">witch</span>.</div>
+      <hr>
+      <div class="grammar-lesson">
+        <strong>Story Explanation:</strong> <span class="grammar-noun">Courage</span> <span class="grammar-verb">wins</span> <span class="grammar-preposition">in</span> <span class="grammar-adjective">fantastical</span> <span class="grammar-noun">battles</span>.<br>
+        <hr>
+        <strong>Grammar Lesson:</strong><br>
+        - "<span class="grammar-noun">siblings/witch</span>": <span class="grammar-noun">nouns</span> name things.<br>
+        - "<span class="grammar-verb">discover/fight</span>": <span class="grammar-verb">verbs</span> show action.<br>
+        - "<span class="grammar-adjective">magical/wicked</span>": <span class="grammar-adjective">adjectives</span> describe <span class="grammar-noun">nouns</span>.<br>
+        - "<span class="grammar-conjunction">and</span>": <span class="grammar-conjunction">conjunction</span> joins ideas.
+      </div>
+    </div>
+  </div>
+  <div class="flashcard" role="button" aria-expanded="false" aria-label="Interactive story summary flashcard 10" tabindex="0" onclick="toggleCard(this)" onkeydown="handleKeydown(event)" ontouchstart="toggleCard(this)">
+    <div class="flashcard-front active">
+      <img src="https://raw.githubusercontent.com/book-covers/repo/main/Matilda.jpg" alt="Matilda cover">
+      <span class="grammar-noun">Matilda</span>
+    </div>
+    <div class="flashcard-back">
+      <div class="story-title"><span class="grammar-noun">Matilda</span></div>
+      <div class="summary"><span class="grammar-noun">Matilda</span> <span class="grammar-verb">uses</span> <span class="grammar-pronoun">her</span> <span class="grammar-adjective">brilliant</span> <span class="grammar-noun">mind</span> <span class="grammar-conjunction">and</span> <span class="grammar-verb">defies</span> <span class="grammar-article">a</span> <span class="grammar-adjective">cruel</span> <span class="grammar-noun">headmistress</span> with <span class="grammar-adjective">magical</span> <span class="grammar-noun">powers</span>.</div>
+      <hr>
+      <div class="grammar-lesson">
+        <strong>Story Explanation:</strong> <span class="grammar-noun">Matilda</span>’s <span class="grammar-adjective">smart</span> <span class="grammar-noun">actions</span> <span class="grammar-verb">overcome</span> <span class="grammar-adjective">unfair</span> <span class="grammar-noun">challenges</span>.<br>
+        <hr>
+        <strong>Grammar Lesson:</strong><br>
+        - "<span class="grammar-noun">Matilda/mind</span>": <span class="grammar-noun">nouns</span> name things.<br>
+        - "<span class="grammar-verb">uses/defies</span>": <span class="grammar-verb">verbs</span> show action.<br>
+        - "<span class="grammar-adjective">brilliant/cruel/magical</span>": <span class="grammar-adjective">adjectives</span> describe <span class="grammar-noun">nouns</span>.<br>
+        - "<span class="grammar-pronoun">her</span>": <span class="grammar-pronoun">pronoun</span> replaces <span class="grammar-noun">noun</span>.
+      </div>
+    </div>
+  </div>
+  <div class="flashcard" role="button" aria-expanded="false" aria-label="Interactive story summary flashcard 11" tabindex="0" onclick="toggleCard(this)" onkeydown="handleKeydown(event)" ontouchstart="toggleCard(this)">
+    <div class="flashcard-front active">
+      <img src="https://raw.githubusercontent.com/book-covers/repo/main/The-Snowy-Day.jpg" alt="The Snowy Day cover">
+      <span class="grammar-article">The</span> Snowy <span class="grammar-noun">Day</span>
+    </div>
+    <div class="flashcard-back">
+      <div class="story-title"><span class="grammar-article">The</span> Snowy <span class="grammar-noun">Day</span></div>
+      <div class="summary"><span class="grammar-noun">Peter</span> <span class="grammar-verb">explores</span> <span class="grammar-article">a</span> <span class="grammar-adjective">wintry</span> <span class="grammar-noun">city</span> <span class="grammar-conjunction">and</span> <span class="grammar-verb">discovers</span> <span class="grammar-adjective">simple</span> snowy <span class="grammar-noun">joys</span>.</div>
+      <hr>
+      <div class="grammar-lesson">
+        <strong>Story Explanation:</strong> <span class="grammar-noun">Peter</span> <span class="grammar-verb">finds</span> <span class="grammar-adjective">quiet</span> <span class="grammar-noun">wonder</span> <span class="grammar-preposition">in</span> <span class="grammar-noun">snow</span>.<br>
+        <hr>
+        <strong>Grammar Lesson:</strong><br>
+        - "<span class="grammar-noun">Peter/city</span>": <span class="grammar-noun">nouns</span> name things.<br>
+        - "<span class="grammar-verb">explores/discovers</span>": <span class="grammar-verb">verbs</span> show action.<br>
+        - "<span class="grammar-adjective">wintry/simple</span>": <span class="grammar-adjective">adjectives</span> describe <span class="grammar-noun">nouns</span>.<br>
+        - "<span class="grammar-conjunction">and</span>": <span class="grammar-conjunction">conjunction</span> joins ideas.
+      </div>
+    </div>
+  </div>
+  <div class="flashcard" role="button" aria-expanded="false" aria-label="Interactive story summary flashcard 12" tabindex="0" onclick="toggleCard(this)" onkeydown="handleKeydown(event)" ontouchstart="toggleCard(this)">
+    <div class="flashcard-front active">
+      <img src="https://raw.githubusercontent.com/book-covers/repo/main/Goodnight-Moon.jpg" alt="Goodnight Moon cover">
+      <span class="grammar-noun">Goodnight Moon</span>
+    </div>
+    <div class="flashcard-back">
+      <div class="story-title"><span class="grammar-noun">Goodnight Moon</span></div>
+      <div class="summary"><span class="grammar-article">A</span> <span class="grammar-noun">bunny</span> <span class="grammar-verb">says</span> <span class="grammar-adjective">gentle</span> <span class="grammar-noun">goodnights</span> <span class="grammar-preposition">to</span> <span class="grammar-adjective">cozy</span> <span class="grammar-noun">objects</span> <span class="grammar-preposition">in</span> <span class="grammar-article">a</span> <span class="grammar-adjective">quiet</span> <span class="grammar-noun">room</span>.</div>
+      <hr>
+      <div class="grammar-lesson">
+        <strong>Story Explanation:</strong> <span class="grammar-adjective">Calm</span> <span class="grammar-noun">rituals</span> <span class="grammar-verb">soothe</span> <span class="grammar-noun">bedtime</span>.<br>
+        <hr>
+        <strong>Grammar Lesson:</strong><br>
+        - "<span class="grammar-noun">bunny/objects</span>": <span class="grammar-noun">nouns</span> name things.<br>
+        - "<span class="grammar-verb">says</span>": <span class="grammar-verb">verb</span> shows action.<br>
+        - "<span class="grammar-adjective">gentle/cozy/quiet</span>": <span class="grammar-adjective">adjectives</span> describe <span class="grammar-noun">nouns</span>.<br>
+        - "<span class="grammar-preposition">to/in</span>": <span class="grammar-preposition">prepositions</span> show relationships.
+      </div>
+    </div>
+  </div>
+  <div class="flashcard" role="button" aria-expanded="false" aria-label="Interactive story summary flashcard 13" tabindex="0" onclick="toggleCard(this)" onkeydown="handleKeydown(event)" ontouchstart="toggleCard(this)">
+    <div class="flashcard-front active">
+      <img src="https://raw.githubusercontent.com/book-covers/repo/main/The-Giving-Tree.jpg" alt="The Giving Tree cover">
+      <span class="grammar-article">The</span> Giving <span class="grammar-noun">Tree</span>
+    </div>
+    <div class="flashcard-back">
+      <div class="story-title"><span class="grammar-article">The</span> Giving <span class="grammar-noun">Tree</span></div>
+      <div class="summary"><span class="grammar-article">A</span> <span class="grammar-noun">tree</span> <span class="grammar-verb">shares</span> <span class="grammar-adjective">selfless</span> <span class="grammar-noun">love</span> <span class="grammar-conjunction">and</span> <span class="grammar-verb">gives</span> everything <span class="grammar-preposition">to</span> <span class="grammar-article">a</span> <span class="grammar-adjective">growing</span> <span class="grammar-noun">boy</span>.</div>
+      <hr>
+      <div class="grammar-lesson">
+        <strong>Story Explanation:</strong> <span class="grammar-noun">Tree</span>’s <span class="grammar-adjective">generous</span> <span class="grammar-noun">acts</span> <span class="grammar-verb">teach</span> <span class="grammar-noun">sacrifice</span>.<br>
+        <hr>
+        <strong>Grammar Lesson:</strong><br>
+        - "<span class="grammar-noun">tree/boy</span>": <span class="grammar-noun">nouns</span> name things.<br>
+        - "<span class="grammar-verb">shares/gives</span>": <span class="grammar-verb">verbs</span> show action.<br>
+        - "<span class="grammar-adjective">selfless/growing</span>": <span class="grammar-adjective">adjectives</span> describe <span class="grammar-noun">nouns</span>.<br>
+        - "<span class="grammar-preposition">to</span>": <span class="grammar-preposition">preposition</span> shows <span class="grammar-noun">direction</span>.
+      </div>
+    </div>
+  </div>
+  <div class="flashcard" role="button" aria-expanded="false" aria-label="Interactive story summary flashcard 14" tabindex="0" onclick="toggleCard(this)" onkeydown="handleKeydown(event)" ontouchstart="toggleCard(this)">
+    <div class="flashcard-front active">
+      <img src="https://raw.githubusercontent.com/book-covers/repo/main/Charlie-and-the-Chocolate-Factory.jpg" alt="Charlie and the Chocolate Factory cover">
+      <span class="grammar-noun">Charlie</span> <span class="grammar-conjunction">and</span> <span class="grammar-article">the</span> Chocolate <span class="grammar-noun">Factory</span>
+    </div>
+    <div class="flashcard-back">
+      <div class="story-title"><span class="grammar-noun">Charlie</span> <span class="grammar-conjunction">and</span> <span class="grammar-article">the</span> Chocolate <span class="grammar-noun">Factory</span></div>
+      <div class="summary"><span class="grammar-noun">Charlie</span> <span class="grammar-verb">enters</span> <span class="grammar-article">a</span> <span class="grammar-adjective">fantastical</span> <span class="grammar-noun">factory</span> <span class="grammar-conjunction">and</span> <span class="grammar-verb">discovers</span> <span class="grammar-adjective">wild</span> <span class="grammar-noun">treats</span>.</div>
+      <hr>
+      <div class="grammar-lesson">
+        <strong>Story Explanation:</strong> <span class="grammar-noun">Charlie</span>’s <span class="grammar-adjective">lucky</span> <span class="grammar-noun">journey</span> <span class="grammar-verb">rewards</span> <span class="grammar-noun">kindness</span>.<br>
+        <hr>
+        <strong>Grammar Lesson:</strong><br>
+        - "<span class="grammar-noun">Charlie/factory</span>": <span class="grammar-noun">nouns</span> name things.<br>
+        - "<span class="grammar-verb">enters/discovers</span>": <span class="grammar-verb">verbs</span> show action.<br>
+        - "<span class="grammar-adjective">fantastical/wild</span>": <span class="grammar-adjective">adjectives</span> describe <span class="grammar-noun">nouns</span>.<br>
+        - "<span class="grammar-conjunction">and</span>": <span class="grammar-conjunction">conjunction</span> joins ideas.
+      </div>
+    </div>
+  </div>
+  <div class="flashcard" role="button" aria-expanded="false" aria-label="Interactive story summary flashcard 15" tabindex="0" onclick="toggleCard(this)" onkeydown="handleKeydown(event)" ontouchstart="toggleCard(this)">
+    <div class="flashcard-front active">
+      <img src="https://raw.githubusercontent.com/book-covers/repo/main/The-Velveteen-Rabbit.jpg" alt="The Velveteen Rabbit cover">
+      <span class="grammar-article">The</span> Velveteen <span class="grammar-noun">Rabbit</span>
+    </div>
+    <div class="flashcard-back">
+      <div class="story-title"><span class="grammar-article">The</span> Velveteen <span class="grammar-noun">Rabbit</span></div>
+      <div class="summary"><span class="grammar-article">A</span> <span class="grammar-noun">rabbit</span> <span class="grammar-verb">learns</span> <span class="grammar-adjective">true</span> <span class="grammar-noun">love</span> <span class="grammar-conjunction">and</span> <span class="grammar-verb">becomes</span> <span class="grammar-adjective">real</span> <span class="grammar-preposition">through</span> <span class="grammar-adjective">tender</span> <span class="grammar-noun">care</span>.</div>
+      <hr>
+      <div class="grammar-lesson">
+        <strong>Story Explanation:</strong> <span class="grammar-noun">Love</span> <span class="grammar-verb">transforms</span> <span class="grammar-adjective">simple</span> <span class="grammar-noun">toys</span>.<br>
+        <hr>
+        <strong>Grammar Lesson:</strong><br>
+        - "<span class="grammar-noun">rabbit/love</span>": <span class="grammar-noun">nouns</span> name things.<br>
+        - "<span class="grammar-verb">learns/becomes</span>": <span class="grammar-verb">verbs</span> show action.<br>
+        - "<span class="grammar-adjective">true/real/tender</span>": <span class="grammar-adjective">adjectives</span> describe <span class="grammar-noun">nouns</span>.<br>
+        - "<span class="grammar-preposition">through</span>": <span class="grammar-preposition">preposition</span> shows <span class="grammar-noun">means</span>.
+      </div>
+    </div>
+  </div>
+  <div class="flashcard" role="button" aria-expanded="false" aria-label="Interactive story summary flashcard 16" tabindex="0" onclick="toggleCard(this)" onkeydown="handleKeydown(event)" ontouchstart="toggleCard(this)">
+    <div class="flashcard-front active">
+      <img src="https://raw.githubusercontent.com/book-covers/repo/main/James-and-the-Giant-Peach.jpg" alt="James and the Giant Peach cover">
+      <span class="grammar-noun">James</span> <span class="grammar-conjunction">and</span> <span class="grammar-article">the</span> Giant <span class="grammar-noun">Peach</span>
+    </div>
+    <div class="flashcard-back">
+      <div class="story-title"><span class="grammar-noun">James</span> <span class="grammar-conjunction">and</span> <span class="grammar-article">the</span> Giant <span class="grammar-noun">Peach</span></div>
+      <div class="summary"><span class="grammar-noun">James</span> <span class="grammar-verb">journeys</span> inside <span class="grammar-article">a</span> <span class="grammar-adjective">giant</span> <span class="grammar-noun">peach</span> with <span class="grammar-adjective">odd</span> <span class="grammar-noun">friends</span> <span class="grammar-preposition">on</span> <span class="grammar-article">a</span> <span class="grammar-adjective">wild</span> <span class="grammar-noun">adventure</span>.</div>
+      <hr>
+      <div class="grammar-lesson">
+        <strong>Story Explanation:</strong> <span class="grammar-noun">James</span> <span class="grammar-verb">finds</span> <span class="grammar-adjective">brave</span> <span class="grammar-noun">friendship</span> <span class="grammar-preposition">in</span> <span class="grammar-noun">danger</span>.<br>
+        <hr>
+        <strong>Grammar Lesson:</strong><br>
+        - "<span class="grammar-noun">James/peach</span>": <span class="grammar-noun">nouns</span> name things.<br>
+        - "<span class="grammar-verb">journeys</span>": <span class="grammar-verb">verb</span> shows action.<br>
+        - "<span class="grammar-adjective">giant/odd/wild</span>": <span class="grammar-adjective">adjectives</span> describe <span class="grammar-noun">nouns</span>.<br>
+        - "<span class="grammar-preposition">on</span>": <span class="grammar-preposition">preposition</span> shows <span class="grammar-noun">place</span>.
+      </div>
+    </div>
+  </div>
+  <div class="flashcard" role="button" aria-expanded="false" aria-label="Interactive story summary flashcard 17" tabindex="0" onclick="toggleCard(this)" onkeydown="handleKeydown(event)" ontouchstart="toggleCard(this)">
+    <div class="flashcard-front active">
+      <img src="https://raw.githubusercontent.com/book-covers/repo/main/Corduroy.jpg" alt="Corduroy cover">
+      <span class="grammar-noun">Corduroy</span>
+    </div>
+    <div class="flashcard-back">
+      <div class="story-title"><span class="grammar-noun">Corduroy</span></div>
+      <div class="summary"><span class="grammar-noun">Corduroy</span> <span class="grammar-verb">searches</span> <span class="grammar-preposition">for</span> <span class="grammar-article">a</span> <span class="grammar-adjective">missing</span> <span class="grammar-noun">button</span> <span class="grammar-conjunction">and</span> <span class="grammar-verb">finds</span> <span class="grammar-article">a</span> <span class="grammar-adjective">loving</span> <span class="grammar-noun">home</span>.</div>
+      <hr>
+      <div class="grammar-lesson">
+        <strong>Story Explanation:</strong> <span class="grammar-noun">Corduroy</span>’s <span class="grammar-adjective">small</span> <span class="grammar-noun">quest</span> <span class="grammar-verb">leads</span> <span class="grammar-preposition">to</span> <span class="grammar-noun">belonging</span>.<br>
+        <hr>
+        <strong>Grammar Lesson:</strong><br>
+        - "<span class="grammar-noun">Corduroy/button</span>": <span class="grammar-noun">nouns</span> name things.<br>
+        - "<span class="grammar-verb">searches/finds</span>": <span class="grammar-verb">verbs</span> show action.<br>
+        - "<span class="grammar-adjective">missing/loving</span>": <span class="grammar-adjective">adjectives</span> describe <span class="grammar-noun">nouns</span>.<br>
+        - "<span class="grammar-preposition">for</span>": <span class="grammar-preposition">preposition</span> shows <span class="grammar-noun">purpose</span>.
+      </div>
+    </div>
+  </div>
+  <div class="flashcard" role="button" aria-expanded="false" aria-label="Interactive story summary flashcard 18" tabindex="0" onclick="toggleCard(this)" onkeydown="handleKeydown(event)" ontouchstart="toggleCard(this)">
+    <div class="flashcard-front active">
+      <img src="https://raw.githubusercontent.com/book-covers/repo/main/The-Secret-Garden.jpg" alt="The Secret Garden cover">
+      <span class="grammar-article">The</span> Secret <span class="grammar-noun">Garden</span>
+    </div>
+    <div class="flashcard-back">
+      <div class="story-title"><span class="grammar-article">The</span> Secret <span class="grammar-noun">Garden</span></div>
+      <div class="summary"><span class="grammar-noun">Mary</span> <span class="grammar-verb">unlocks</span> <span class="grammar-article">a</span> <span class="grammar-adjective">hidden</span> <span class="grammar-noun">garden</span> <span class="grammar-conjunction">and</span> <span class="grammar-verb">heals</span> with <span class="grammar-adjective">new</span> <span class="grammar-noun">friends</span>.</div>
+      <hr>
+      <div class="grammar-lesson">
+        <strong>Story Explanation:</strong> <span class="grammar-noun">Nature</span> <span class="grammar-verb">restores</span> <span class="grammar-adjective">broken</span> <span class="grammar-noun">hearts</span>.<br>
+        <hr>
+        <strong>Grammar Lesson:</strong><br>
+        - "<span class="grammar-noun">Mary/garden</span>": <span class="grammar-noun">nouns</span> name things.<br>
+        - "<span class="grammar-verb">unlocks/heals</span>": <span class="grammar-verb">verbs</span> show action.<br>
+        - "<span class="grammar-adjective">hidden/new</span>": <span class="grammar-adjective">adjectives</span> describe <span class="grammar-noun">nouns</span>.<br>
+        - "<span class="grammar-conjunction">and</span>": <span class="grammar-conjunction">conjunction</span> joins ideas.
+      </div>
+    </div>
+  </div>
+  <div class="flashcard" role="button" aria-expanded="false" aria-label="Interactive story summary flashcard 19" tabindex="0" onclick="toggleCard(this)" onkeydown="handleKeydown(event)" ontouchstart="toggleCard(this)">
+    <div class="flashcard-front active">
+      <img src="https://raw.githubusercontent.com/book-covers/repo/main/The-Wind-in-the-Willows.jpg" alt="The Wind in the Willows cover">
+      <span class="grammar-article">The</span> <span class="grammar-noun">Wind</span> <span class="grammar-preposition">in</span> <span class="grammar-article">the</span> <span class="grammar-noun">Willows</span>
+    </div>
+    <div class="flashcard-back">
+      <div class="story-title"><span class="grammar-article">The</span> <span class="grammar-noun">Wind</span> <span class="grammar-preposition">in</span> <span class="grammar-article">the</span> <span class="grammar-noun">Willows</span></div>
+      <div class="summary"><span class="grammar-noun">Mole</span> <span class="grammar-verb">explores</span> <span class="grammar-adjective">charming</span> <span class="grammar-noun">riverbank</span> <span class="grammar-noun">adventures</span> with <span class="grammar-adjective">loyal</span> <span class="grammar-noun">friends</span>.</div>
+      <hr>
+      <div class="grammar-lesson">
+        <strong>Story Explanation:</strong> <span class="grammar-noun">Friendship</span> <span class="grammar-verb">shines</span> <span class="grammar-preposition">in</span> <span class="grammar-adjective">peaceful</span> <span class="grammar-noun">settings</span>.<br>
+        <hr>
+        <strong>Grammar Lesson:</strong><br>
+        - "<span class="grammar-noun">Mole/friends</span>": <span class="grammar-noun">nouns</span> name things.<br>
+        - "<span class="grammar-verb">explores</span>": <span class="grammar-verb">verb</span> shows action.<br>
+        - "<span class="grammar-adjective">charming/loyal</span>": <span class="grammar-adjective">adjectives</span> describe <span class="grammar-noun">nouns</span>.<br>
+        - "<span class="grammar-preposition">with</span>": <span class="grammar-preposition">preposition</span> shows <span class="grammar-noun">company</span>.
+      </div>
+    </div>
+  </div>
+  <div class="flashcard" role="button" aria-expanded="false" aria-label="Interactive story summary flashcard 20" tabindex="0" onclick="toggleCard(this)" onkeydown="handleKeydown(event)" ontouchstart="toggleCard(this)">
+    <div class="flashcard-front active">
+      <img src="https://raw.githubusercontent.com/book-covers/repo/main/Harold-and-the-Purple-Crayon.jpg" alt="Harold and the Purple Crayon cover">
+      <span class="grammar-noun">Harold</span> <span class="grammar-conjunction">and</span> <span class="grammar-article">the</span> Purple <span class="grammar-noun">Crayon</span>
+    </div>
+    <div class="flashcard-back">
+      <div class="story-title"><span class="grammar-noun">Harold</span> <span class="grammar-conjunction">and</span> <span class="grammar-article">the</span> Purple <span class="grammar-noun">Crayon</span></div>
+      <div class="summary"><span class="grammar-noun">Harold</span> <span class="grammar-verb">draws</span> <span class="grammar-article">a</span> <span class="grammar-adjective">magical</span> <span class="grammar-noun">world</span> with <span class="grammar-article">a</span> <span class="grammar-adjective">purple</span> <span class="grammar-noun">crayon</span> <span class="grammar-conjunction">and</span> <span class="grammar-verb">explores</span> <span class="grammar-adverb">endlessly</span>.</div>
+      <hr>
+      <div class="grammar-lesson">
+        <strong>Story Explanation:</strong> <span class="grammar-noun">Imagination</span> <span class="grammar-verb">creates</span> <span class="grammar-adjective">endless</span> <span class="grammar-noun">possibilities</span>.<br>
+        <hr>
+        <strong>Grammar Lesson:</strong><br>
+        - "<span class="grammar-noun">Harold/crayon</span>": <span class="grammar-noun">nouns</span> name things.<br>
+        - "<span class="grammar-verb">draws/explores</span>": <span class="grammar-verb">verbs</span> show action.<br>
+        - "<span class="grammar-adjective">magical/purple</span>": <span class="grammar-adjective">adjectives</span> describe <span class="grammar-noun">nouns</span>.<br>
+        - "<span class="grammar-adverb">endlessly</span>": <span class="grammar-adverb">adverb</span> adds <span class="grammar-verb">verb</span> detail.
+      </div>
+    </div>
+  </div>
+  <div class="grammar-key">
+    <strong>Grammar Key:</strong> <span class="grammar-noun">Nouns</span>, <span class="grammar-verb">Verbs</span>, <span class="grammar-adjective">Adjectives</span>, <span class="grammar-adverb">Adverbs</span>, <span class="grammar-article">Articles</span>, <span class="grammar-preposition">Prepositions</span>, <span class="grammar-conjunction">Conjunctions</span>, <span class="grammar-pronoun">Pronouns</span>
+  </div>
+  <div class="navigation">
+    <button class="nav-button" id="prev-button" disabled aria-label="Go to previous flashcard" onclick="navigateCard('prev')">
+      <img src="https://cdn-icons-png.flaticon.com/512/271/271220.png" alt="Go to previous flashcard" class="nav-icon">
+    </button>
+    <button class="nav-button" id="next-button" aria-label="Go to next flashcard" onclick="navigateCard('next')">
+      <img src="https://cdn-icons-png.flaticon.com/512/271/271228.png" alt="Go to next flashcard" class="nav-icon">
+    </button>
+  </div>
+  <script>
+    let currentCardIndex = 0;
+    const cards = document.querySelectorAll('.flashcard');
+    const preferredVoices = ['Google UK English Female', 'Google UK English Male', 'Daniel', 'Kate'];
+
+    function getBritishVoice() {
+      const voices = window.speechSynthesis.getVoices();
+      return voices.find(voice => preferredVoices.includes(voice.name) && voice.lang === 'en-GB') ||
+             voices.find(voice => voice.lang === 'en-GB') ||
+             voices.find(voice => voice.lang === 'en-US');
+    }
+
+    function updateCardDisplay() {
+      cards.forEach((card, index) => {
+        card.classList.toggle('active', index === currentCardIndex);
+        if (index === currentCardIndex) {
+          card.querySelector('.flashcard-front').classList.add('active');
+          card.querySelector('.flashcard-back').classList.remove('active');
+          card.setAttribute('aria-expanded', 'false');
+        }
+      });
+      document.querySelector('.start-button').style.display = 'block';
+      document.querySelector('.continue-button').style.display = 'none';
+      document.querySelector('#prev-button').disabled = currentCardIndex === 0;
+      document.querySelector('#next-button').disabled = currentCardIndex === cards.length - 1;
+      const prevIcon = document.querySelector('#prev-button .nav-icon');
+      const nextIcon = document.querySelector('#next-button .nav-icon');
+      prevIcon.classList.toggle('disabled', currentCardIndex === 0);
+      nextIcon.classList.toggle('disabled', currentCardIndex === cards.length - 1);
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+      adjustFontSize();
+      const message = document.querySelector('.speech-message');
+      if (message) message.remove();
+    }
+
+    function navigateCard(direction) {
+      if (direction === 'next' && currentCardIndex < cards.length - 1) {
+        currentCardIndex++;
+      } else if (direction === 'prev' && currentCardIndex > 0) {
+        currentCardIndex--;
+      }
+      updateCardDisplay();
+    }
+
+    function startStory() {
+      if ('speechSynthesis' in window) {
+        const card = document.querySelector('.flashcard.active');
+        const front = card.querySelector('.flashcard-front');
+        const summary = card.querySelector('.summary');
+        const explanation = card.querySelector('.grammar-lesson strong:first-child').nextSibling.textContent;
+        const titleText = front.textContent.replace(/<[^>]+>/g, '');
+        const summaryText = summary.textContent.replace(/<[^>]+>/g, '');
+        const combinedText = `${titleText}. ${summaryText}. ${explanation}`;
+        const utterance = new SpeechSynthesisUtterance(combinedText);
+        utterance.lang = 'en-GB';
+        const voice = getBritishVoice();
+        if (voice && voice.lang === 'en-GB') {
+          utterance.voice = voice;
+        } else {
+          const message = document.createElement('div');
+          message.className = 'speech-message';
+          message.textContent = 'No British voice found, using default voice.';
+          document.querySelector('h1').after(message);
+        }
+        utterance.onerror = (event) => {
+          console.error('Speech synthesis error:', event.error);
+          const message = document.createElement('div');
+          message.className = 'speech-message';
+          message.textContent = 'Speech synthesis not supported or failed.';
+          document.querySelector('h1').after(message);
+        };
+        utterance.onend = () => {
+          document.querySelector('.start-button').style.display = 'block';
+          document.querySelector('.continue-button').style.display = 'none';
+          const message = document.querySelector('.speech-message');
+          if (message) message.remove();
+        };
+        window.speechSynthesis.speak(utterance);
+        document.querySelector('.start-button').style.display = 'none';
+        toggleCard(card);
+      } else {
+        const message = document.createElement('div');
+        message.className = 'speech-message';
+        message.textContent = 'Speech synthesis not supported in this browser.';
+        document.querySelector('h1').after(message);
+        document.querySelector('.start-button').style.display = 'none';
+        document.querySelector('.continue-button').style.display = 'block';
+        toggleCard(document.querySelector('.flashcard.active'));
+      }
+    }
+
+    function toggleCard(card) {
+      try {
+        const front = card.querySelector('.flashcard-front');
+        const back = card.querySelector('.flashcard-back');
+        front.classList.toggle('active');
+        back.classList.toggle('active');
+        card.setAttribute('aria-expanded', back.classList.contains('active'));
+        adjustFontSize();
+        const message = document.querySelector('.speech-message');
+        if (message) message.remove();
+      } catch (error) {
+        console.error('Error toggling card:', error);
+        card.querySelector('.flashcard-front').classList.remove('active');
+        card.querySelector('.flashcard-back').classList.add('active');
+        card.setAttribute('aria-expanded', 'true');
+      }
+    }
+
+    function handleKeydown(event) {
+      if (event.key === 'Enter' || event.key === ' ') {
+        toggleCard(event.currentTarget);
+        event.preventDefault();
+      }
+    }
+
+    function adjustFontSize() {
+      const card = document.querySelector('.flashcard.active');
+      const back = card.querySelector('.flashcard-back');
+      const padding = parseInt(getComputedStyle(card).paddingTop) * 2;
+      const availableHeight = card.clientHeight - padding;
+      let fontSize = parseFloat(getComputedStyle(back).fontSize);
+      let minFontSize = 12;
+      let maxFontSize = 18;
+      let step = 0.25;
+      while (back.scrollHeight > availableHeight && fontSize > minFontSize) {
+        fontSize -= step;
+        updateFontSizes(back, fontSize);
+      }
+      while (back.scrollHeight < availableHeight * 0.95 && fontSize < maxFontSize) {
+        fontSize += step;
+        updateFontSizes(back, fontSize);
+      }
+    }
+
+    function updateFontSizes(back, fontSize) {
+      back.style.fontSize = `${fontSize}px`;
+      back.querySelector('.story-title').style.fontSize = `${fontSize * 0.9}px`;
+      back.querySelector('.summary').style.fontSize = `${fontSize * 1.15}px`;
+      back.querySelector('.grammar-lesson').style.fontSize = `${fontSize * 0.85}px`;
+    }
+
+    let resizeTimeout;
+    window.addEventListener('load', () => {
+      window.speechSynthesis.onvoiceschanged = () => {
+        updateCardDisplay();
+      };
+      updateCardDisplay();
+      if (!('speechSynthesis' in window)) {
+        document.querySelector('.start-button').style.display = 'none';
+        document.querySelector('.continue-button').style.display = 'block';
+      }
+    });
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(adjustFontSize, 100);
+    });
+  </script>
 </body>
 </html>
